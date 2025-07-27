@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import TodoBoard from "../components/TodoBoard";
 import api from "../utils/api";
 import { Notify } from "notiflix";
@@ -10,11 +10,9 @@ const TodoPage = ({ handleLogout }) => {
   const [priority, setPriority] = useState(3);
   const [currentUser, setCurrentUser] = useState(null);
   const [showMyTodos, setShowMyTodos] = useState(false);
-  const [searchKeyword, setSearchKeyword] = useState("");
 
   const titleRef = useRef(null);
   const contentRef = useRef(null);
-  const searchInputRef = useRef(null);
 
   // 현재 로그인한 사용자 정보를 가져오는 함수
   const getCurrentUser = async () => {
@@ -28,7 +26,7 @@ const TodoPage = ({ handleLogout }) => {
   };
 
   // TODO 목록을 가져오는 함수
-  const getTasks = async (isMyTodos = false, keyword = "") => {
+  const getTasks = useCallback(async (isMyTodos = false, keyword = "") => {
     try {
       let url = "/tasks";
       if (isMyTodos) url = "/tasks/my";
@@ -40,7 +38,7 @@ const TodoPage = ({ handleLogout }) => {
     } catch (error) {
       console.error("error", error);
     }
-  };
+  }, []);
 
   // TODO를 추가하는 함수
   const handleAddTask = async () => {
@@ -65,7 +63,7 @@ const TodoPage = ({ handleLogout }) => {
         setTitle("");
         setContent("");
         setPriority(3);
-        getTasks(showMyTodos, searchKeyword);
+        getTasks(showMyTodos, "");
       } else {
         throw new Error("task can not be added");
       }
@@ -75,25 +73,15 @@ const TodoPage = ({ handleLogout }) => {
   };
 
   // "나의 TODO" 토글 핸들러
-  const handleToggleMyTodos = () => {
+  const handleToggleMyTodos = useCallback(() => {
     const newState = !showMyTodos;
     setShowMyTodos(newState);
-    setSearchKeyword("");
     getTasks(newState, "");
-  };
-
-  // 검색어 입력 핸들러
-
-  // 검색 버튼 클릭 핸들러
-  const handleKeywordSearch = (e) => {
-    e.preventDefault();
-    setShowMyTodos(false);
-    getTasks(false, searchKeyword);
-  };
+  }, [showMyTodos, getTasks]);
 
   useEffect(() => {
     getCurrentUser();
-    getTasks();
+    getTasks(showMyTodos, "");
   }, []);
 
   return (
@@ -169,6 +157,7 @@ const TodoPage = ({ handleLogout }) => {
         showMyTodos={showMyTodos}
         handleToggleMyTodos={handleToggleMyTodos}
         currentUser={currentUser}
+        setShowMyTodos={setShowMyTodos}
       />
     </section>
   );
