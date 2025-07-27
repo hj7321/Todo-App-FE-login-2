@@ -1,32 +1,49 @@
-import { useState } from "react";
-import Button from "react-bootstrap/Button";
+import { useRef, useState } from "react";
 import Form from "react-bootstrap/Form";
 
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import api from "../utils/api";
+import { Notify } from "notiflix";
+
+const formGroupStyle = "flex flex-col gap-[2px]";
+const labelStyle = "text-[12px]";
+const inputStyle =
+  "border rounded-[4px] w-[250px] p-[10px] text-[16px] outline-none";
 
 const LoginPage = ({ user, setUser }) => {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [pw, setPw] = useState("");
+
+  const emailInputRef = useRef(null);
+  const pwInputRef = useRef(null);
 
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
 
+    if (!email || !email.trim()) {
+      Notify.failure("이메일을 입력해주세요.");
+      emailInputRef.current.focus();
+      return;
+    } else if (!pw || !pw.trim()) {
+      Notify.failure("비밀번호를 입력해주세요.");
+      pwInputRef.current.focus();
+      return;
+    }
+
     try {
-      const response = await api.post("/user/login", { email, password });
+      const response = await api.post("/user/login", { email, password: pw });
       if (response.status === 200) {
         setUser(response.data.user);
         sessionStorage.setItem("token", response.data.token);
         api.defaults.headers["authorization"] = "Bearer " + response.data.token;
-        setError("");
         navigate("/");
-      }
-      throw new Error(response.message);
+      } else throw new Error(response.message);
     } catch (error) {
-      setError(error.message);
+      Notify.failure(error.message, {
+        width: "320px",
+      });
     }
   };
 
@@ -35,34 +52,45 @@ const LoginPage = ({ user, setUser }) => {
   }
 
   return (
-    <div className="display-center">
-      {error && <div>{error}</div>}
-      <Form className="login-box" onSubmit={handleLogin}>
-        <h1>로그인</h1>
-        <Form.Group className="mb-3" controlId="formBasicEmail">
-          <Form.Label>Email address</Form.Label>
-          <Form.Control
+    <div className="display-center bg-gradient-to-b from-main to-main/20">
+      <Form
+        className="bg-white px-[50px] py-[60px] rounded-[12px] [filter:drop-shadow(0px_0px_10px_rgba(0,0,0,0.4))] flex flex-col items-center gap-[12px]"
+        onSubmit={handleLogin}
+      >
+        <h1 className="font-suit-700 mb-[30px]">Login</h1>
+        <div className={formGroupStyle}>
+          <label className={labelStyle}>이메일</label>
+          <input
             type="email"
-            placeholder="Enter email"
             onChange={(e) => setEmail(e.target.value)}
+            ref={emailInputRef}
+            className={inputStyle}
           />
-        </Form.Group>
+        </div>
 
-        <Form.Group className="mb-3" controlId="formBasicPassword">
-          <Form.Label>Password</Form.Label>
-          <Form.Control
+        <div className={formGroupStyle}>
+          <label className={labelStyle}>비밀번호</label>
+          <input
             type="password"
-            placeholder="Password"
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => setPw(e.target.value)}
+            ref={pwInputRef}
+            className={inputStyle}
           />
-        </Form.Group>
-        <div className="button-box">
-          <Button type="submit" className="button-primary">
-            Login
-          </Button>
-          <span>
-            계정이 없다면? <Link to="/register">회원가입 하기</Link>
-          </span>
+        </div>
+        <button
+          type="submit"
+          className="mt-[10px] p-[10px] bg-[#80b3ff] hover:bg-[#687eff] rounded-[6px] text-white w-[250px] text-[14px]"
+        >
+          로그인
+        </button>
+        <div className="text-[12px] flex gap-[10px]">
+          <p className="">계정이 없으신가요?</p>
+          <Link
+            to="/register"
+            className="text-[12px] text-[#999999] hover:text-black no-underline hover:underline"
+          >
+            회원가입 하기
+          </Link>
         </div>
       </Form>
     </div>
