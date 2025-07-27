@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import TodoItem from "./TodoItem";
 
 const TodoBoard = ({
@@ -6,13 +7,44 @@ const TodoBoard = ({
   showMyTodos,
   handleToggleMyTodos,
   currentUser,
+  setShowMyTodos,
 }) => {
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const searchInputRef = useRef(null);
+
+  const handleSearchChange = (e) => {
+    setSearchKeyword(e.target.value);
+    setShowMyTodos(false);
+  };
+
+  // 디바운싱 적용
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      getTasks(false, searchKeyword);
+    }, 400);
+
+    return () => clearTimeout(handler);
+  }, [searchKeyword, getTasks]);
+
   return (
-    <div className="mt-[20px] mb-[60px] w-full">
-      <div className="flex justify-between">
+    <div className="mt-[20px] w-full min-h-[400px]">
+      <div className="flex justify-between items-centerm mb-[10px]">
         <h2 className="font-suit-800 text-[26px]">📝 TODO LIST</h2>
-        <div></div>
-        <button onClick={handleToggleMyTodos} className="hover:font-suit-700">
+        <input
+          type="text"
+          placeholder="검색어를 입력하세요 (제목 또는 내용)"
+          className="w-[300px] border placeholder:text-[12px] px-[10px] py-[7px] rounded-[4px] outline-none text-[15px]"
+          value={searchKeyword}
+          onChange={handleSearchChange}
+          ref={searchInputRef}
+        />
+        <button
+          onClick={() => {
+            handleToggleMyTodos();
+            setSearchKeyword("");
+          }}
+          className="hover:font-suit-700 mr-[5px] w-[100px]"
+        >
           {showMyTodos ? "모두의 TODO" : "나의 TODO"}
         </button>
       </div>
@@ -27,7 +59,7 @@ const TodoBoard = ({
             />
           ))
         ) : (
-          <h2>There is no Item to show</h2>
+          <div></div>
         )}
       </div>
     </div>
