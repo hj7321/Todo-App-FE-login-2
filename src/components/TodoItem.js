@@ -85,7 +85,7 @@ const TodoItem = ({ item, getTasks, currentUser }) => {
               type="text"
               value={editTitle}
               onChange={(e) => setEditTitle(e.target.value)}
-              className="bg-transparent font-bold text-[18px] outline-none border-none focus:ring-0"
+              className="bg-transparent font-suit-800 text-[18px] outline-none border-none focus:ring-0"
               spellCheck="false"
               readOnly={!isMyTodo}
             />
@@ -94,7 +94,7 @@ const TodoItem = ({ item, getTasks, currentUser }) => {
               value={editContent}
               onChange={(e) => setEditContent(e.target.value)}
               className="bg-transparent text-[15px] outline-none border-none focus:ring-0 w-full resize-none"
-              rows={Math.max(3, editContent.split("\n").length)} // 내용에 따라 높이 자동 조절 (최소 3줄)
+              rows={Math.max(2, editContent.split("\n").length)} // 내용에 따라 높이 자동 조절 (최소 3줄)
               style={{ whiteSpace: "pre-wrap" }} // 줄바꿈과 공백을 유지하도록 스타일 추가
               spellCheck="false"
               readOnly={!isMyTodo}
