@@ -1,26 +1,56 @@
-import { useState } from "react";
-import Button from "react-bootstrap/Button";
+import { useRef, useState } from "react";
 import Form from "react-bootstrap/Form";
 import api from "../utils/api";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { Notify } from "notiflix";
+
+const formGroupStyle = "flex flex-col gap-[2px]";
+const labelStyle = "text-[12px]";
+const inputStyle =
+  "border rounded-[4px] w-[250px] p-[10px] text-[16px] outline-none";
 
 const RegisterPage = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [rePassword, setRePassword] = useState("");
+  const [pw, setPw] = useState("");
+  const [pwCheck, setPwCheck] = useState("");
   const [error, setError] = useState("");
+
+  const nameInputRef = useRef(null);
+  const emailInputRef = useRef(null);
+  const pwInputRef = useRef(null);
+  const pwCheckInputRef = useRef(null);
 
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!name || !name.trim()) {
+      Notify.failure("이름을 입력해주세요.");
+      nameInputRef.current.focus();
+      return;
+    } else if (!email || !email.trim()) {
+      Notify.failure("이메일을 입력해주세요.");
+      emailInputRef.current.focus();
+      return;
+    } else if (!pw || !pw.trim()) {
+      Notify.failure("비밀번호를 입력해주세요.");
+      pwInputRef.current.focus();
+      return;
+    } else if (!pwCheck || !pwCheck.trim()) {
+      Notify.failure("비밀번호를 한 번 더 입력해주세요.", {
+        width: "300px",
+      });
+      pwCheckInputRef.current.focus();
+      return;
+    }
+
     try {
-      if (password !== rePassword) {
+      if (pw !== pwCheck) {
         throw new Error("비밀번호가 일치하지 않습니다.");
       }
-      const response = await api.post("/user", { name, email, password });
+      const response = await api.post("/user", { name, email, password: pw });
       if (response.status === 200) {
         navigate("/login");
       } else {
@@ -32,53 +62,69 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="display-center">
+    <div className="display-center bg-gradient-to-b from-main to-main/20">
       {error && <div>{error}</div>}
-      <Form className="login-box" onSubmit={handleSubmit}>
-        <h1>회원가입</h1>
-        <Form.Group className="mb-3" controlId="formName">
-          <Form.Label>Name</Form.Label>
-          <Form.Control
-            type="string"
-            placeholder="Name"
+      <Form
+        className="bg-white px-[50px] py-[60px] rounded-[12px] [filter:drop-shadow(0px_0px_10px_rgba(0,0,0,0.4))] flex flex-col items-center gap-[12px]"
+        onSubmit={handleSubmit}
+      >
+        <h1 className="font-suit-700 mb-[30px]">Sign Up</h1>
+        <div className={formGroupStyle}>
+          <label className={labelStyle}>이름</label>
+          <input
+            type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
+            ref={nameInputRef}
+            className={inputStyle}
           />
-        </Form.Group>
+        </div>
 
-        <Form.Group className="mb-3" controlId="formBasicEmail">
-          <Form.Label>Email address</Form.Label>
-          <Form.Control
+        <div className={formGroupStyle}>
+          <label className={labelStyle}>이메일</label>
+          <input
             type="email"
-            placeholder="Enter email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            ref={emailInputRef}
+            className={inputStyle}
           />
-        </Form.Group>
+        </div>
 
-        <Form.Group className="mb-3" controlId="formBasicPassword">
-          <Form.Label>Password</Form.Label>
-          <Form.Control
+        <div className={formGroupStyle}>
+          <label className={labelStyle}>비밀번호</label>
+          <input
             type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={pw}
+            onChange={(e) => setPw(e.target.value)}
+            ref={pwInputRef}
+            className={inputStyle}
           />
-        </Form.Group>
+        </div>
 
-        <Form.Group className="mb-3" controlId="formBasicPassword">
-          <Form.Label>re-enter the password</Form.Label>
-          <Form.Control
+        <div className={formGroupStyle}>
+          <label className={labelStyle}>비밀번호 확인</label>
+          <input
             type="password"
-            placeholder="re-enter the password"
-            value={rePassword}
-            onChange={(e) => setRePassword(e.target.value)}
+            value={pwCheck}
+            onChange={(e) => setPwCheck(e.target.value)}
+            ref={pwCheckInputRef}
+            className={inputStyle}
           />
-        </Form.Group>
+        </div>
 
-        <Button className="button-primary" type="submit">
+        <button
+          type="submit"
+          className="mt-[10px] p-[10px] bg-[#80b3ff] hover:bg-[#687eff] rounded-[6px] text-white w-[250px] text-[14px]"
+        >
           회원가입
-        </Button>
+        </button>
+        <Link
+          to="/login"
+          className="text-[12px] text-[#999999] hover:text-black no-underline hover:underline"
+        >
+          로그인하기
+        </Link>
       </Form>
     </div>
   );
