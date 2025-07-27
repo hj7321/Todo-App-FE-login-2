@@ -7,9 +7,17 @@ import RegisterPage from "./pages/RegisterPage";
 import { useEffect, useState } from "react";
 import PrivateRoute from "./route/PrivateRoute";
 import api from "./utils/api";
+import { Notify } from "notiflix";
 
 function App() {
   const [user, setUser] = useState(null);
+
+  Notify.init({
+    fontFamily: "SUIT-Medium",
+    fontSize: "15px",
+    timeout: 4000,
+    cssAnimationDuration: 600,
+  });
 
   const getUser = async () => {
     try {
@@ -23,6 +31,11 @@ function App() {
     }
   };
 
+  const handleLogout = () => {
+    sessionStorage.removeItem("token");
+    setUser(null);
+  };
+
   useEffect(() => {
     getUser();
   }, []);
@@ -33,7 +46,7 @@ function App() {
         path="/"
         element={
           <PrivateRoute user={user}>
-            <TodoPage />
+            <TodoPage handleLogout={handleLogout} />
           </PrivateRoute>
         }
       />
