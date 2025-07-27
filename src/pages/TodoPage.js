@@ -1,87 +1,176 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import TodoBoard from "../components/TodoBoard";
 import api from "../utils/api";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import Container from "react-bootstrap/Container";
+import { Notify } from "notiflix";
 
-const TodoPage = () => {
+const TodoPage = ({ handleLogout }) => {
   const [todoList, setTodoList] = useState([]);
-  const [todoValue, setTodoValue] = useState("");
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [priority, setPriority] = useState(3);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [showMyTodos, setShowMyTodos] = useState(false);
+  const [searchKeyword, setSearchKeyword] = useState("");
 
-  const getTasks = async () => {
-    const response = await api.get("/tasks");
-    console.log("taskList", response.data.data);
-    setTodoList(response.data.data);
+  const titleRef = useRef(null);
+  const contentRef = useRef(null);
+  const searchInputRef = useRef(null);
+
+  // 현재 로그인한 사용자 정보를 가져오는 함수
+  const getCurrentUser = async () => {
+    try {
+      const response = await api.get("/user/me");
+      setCurrentUser(response.data.user);
+    } catch (error) {
+      console.error("error", error);
+      handleLogout();
+    }
   };
-  useEffect(() => {
-    getTasks();
-  }, []);
-  const addTodo = async () => {
+
+  // TODO 목록을 가져오는 함수
+  const getTasks = async (isMyTodos = false, keyword = "") => {
+    try {
+      let url = "/tasks";
+      if (isMyTodos) url = "/tasks/my";
+      else if (keyword.trim()) url = `/tasks/search?q=${keyword.trim()}`;
+
+      const response = await api.get(url);
+      const data = response.data.data;
+      setTodoList(data);
+    } catch (error) {
+      console.error("error", error);
+    }
+  };
+
+  // TODO를 추가하는 함수
+  const handleAddTask = async () => {
+    if (!title || !title.trim()) {
+      Notify.failure("제목을 입력해주세요.");
+      titleRef.current.focus();
+      return;
+    } else if (!content || !content.trim()) {
+      Notify.failure("내용을 입력해주세요.");
+      contentRef.current.focus();
+      return;
+    }
+
     try {
       const response = await api.post("/tasks", {
-        task: todoValue,
+        title,
+        content,
+        priority,
         isComplete: false,
       });
-      if (response.status === 200) {
-        getTasks();
+      if (response.status === 201) {
+        setTitle("");
+        setContent("");
+        setPriority(3);
+        getTasks(showMyTodos, searchKeyword);
+      } else {
+        throw new Error("task can not be added");
       }
-      setTodoValue("");
     } catch (error) {
-      console.log("error:", error);
+      console.error("error", error);
     }
   };
 
-  const deleteItem = async (id) => {
-    try {
-      console.log(id);
-      const response = await api.delete(`/tasks/${id}`);
-      if (response.status === 200) {
-        getTasks();
-      }
-    } catch (error) {
-      console.log("error", error);
-    }
+  // "나의 TODO" 토글 핸들러
+  const handleToggleMyTodos = () => {
+    const newState = !showMyTodos;
+    setShowMyTodos(newState);
+    setSearchKeyword("");
+    getTasks(newState, "");
   };
 
-  const toggleComplete = async (id) => {
-    try {
-      const task = todoList.find((item) => item._id === id);
-      const response = await api.put(`/tasks/${id}`, {
-        isComplete: !task.isComplete,
-      });
-      if (response.status === 200) {
-        getTasks();
-      }
-    } catch (error) {
-      console.log("error", error);
-    }
+  // 검색어 입력 핸들러
+
+  // 검색 버튼 클릭 핸들러
+  const handleKeywordSearch = (e) => {
+    e.preventDefault();
+    setShowMyTodos(false);
+    getTasks(false, searchKeyword);
   };
+
+  useEffect(() => {
+    getCurrentUser();
+    getTasks();
+  }, []);
+
   return (
-    <Container>
-      <Row className="add-item-row">
-        <Col xs={12} sm={10}>
-          <input
-            type="text"
-            placeholder="할일을 입력하세요"
-            onChange={(event) => setTodoValue(event.target.value)}
-            className="input-box"
-            value={todoValue}
-          />
-        </Col>
-        <Col xs={12} sm={2}>
-          <button onClick={addTodo} className="button-add">
-            추가
-          </button>
-        </Col>
-      </Row>
+    <section className="flex flex-col items-center min-h-screen py-[10px] px-[40px]">
+      <header className="relative w-full flex justify-center">
+        <img src="/images/logo.png" alt="logo" width={300} className="" />
+        <button
+          onClick={handleLogout}
+          className="text-[#747474] absolute right-[0px] text-[15px] hover:font-suit-700"
+        >
+          로그아웃
+        </button>
+      </header>
+
+      <div className="flex flex-col gap-[10px] mb-[20px] w-[600px] rounded-[6px] bg-main/20 px-[20px] pt-[12px] pb-[20px] shadow-md">
+        <h3 className="font-suit-800 text-[20px]">TODO를 작성해 주세요</h3>
+        <div className="flex flex-col gap-[5px]">
+          <div>
+            <label htmlFor="title" className="text-gray-600 text-[14px]">
+              제목
+            </label>
+            <input
+              type="text"
+              id="title"
+              className="input-box"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              ref={titleRef}
+            />
+          </div>
+          <div>
+            <label htmlFor="content" className="text-gray-600 text-[14px]">
+              내용
+            </label>
+            <textarea
+              type="text"
+              id="content"
+              className="input-box h-[15vh] resize-none"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              ref={contentRef}
+            />
+          </div>
+          <div className="flex gap-[10px] items-center">
+            <label htmlFor="priority" className="text-gray-600 text-[14px]">
+              중요도
+            </label>
+            <select
+              id="priority"
+              value={priority}
+              onChange={(e) => setPriority(Number(e.target.value))}
+              className="h-[28px] w-[130px] border border-lightblue text-[14px] outline-none cursor-pointer rounded-[4px]"
+            >
+              <option value={1}>⭐</option>
+              <option value={2}>⭐⭐</option>
+              <option value={3}>⭐⭐⭐</option>
+              <option value={4}>⭐⭐⭐⭐</option>
+              <option value={5}>⭐⭐⭐⭐⭐</option>
+            </select>
+          </div>
+        </div>
+        <button
+          onClick={handleAddTask}
+          className="rounded-[4px] bg-green-400 hover:bg-green-500 text-white text-[13px] px-[10px] py-[6px] h-fit w-fit"
+        >
+          추가하기
+        </button>
+      </div>
 
       <TodoBoard
         todoList={todoList}
-        deleteItem={deleteItem}
-        toggleComplete={toggleComplete}
+        getTasks={getTasks}
+        showMyTodos={showMyTodos}
+        handleToggleMyTodos={handleToggleMyTodos}
+        currentUser={currentUser}
       />
-    </Container>
+    </section>
   );
 };
 
