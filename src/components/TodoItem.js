@@ -3,7 +3,7 @@ import api from "../utils/api";
 import { Notify } from "notiflix";
 
 const buttonStyle =
-  "rounded-[4px] text-white text-[12px] px-[8px] py-[4px] h-fit w-fit";
+  "rounded-[4px] text-white text-[9.5px] sm:text-[12px] px-[6px] sm:px-[8px] py-[3px] sm:py-[4px] h-fit w-fit";
 
 const TodoItem = ({ item, getTasks, currentUser }) => {
   const [editTitle, setEditTitle] = useState(item.title);
@@ -77,15 +77,15 @@ const TodoItem = ({ item, getTasks, currentUser }) => {
   };
 
   return (
-    <div className="min-w-[340px]">
-      <div className="bg-main/20 flex flex-col gap-[30px] px-[12px] py-[9px] shadow-md rounded-[4px]">
+    <div className="w-[100%] max-w-[300px] sm:max-w-none sm:w-[340px]">
+      <div className="bg-main/20 flex flex-col gap-[5px] sm:gap-[7px] px-[12px] py-[9px] shadow-md rounded-[4px]">
         <div className="relative">
           <div className="flex flex-col gap-[3px]">
             <input
               type="text"
               value={editTitle}
               onChange={(e) => setEditTitle(e.target.value)}
-              className="bg-transparent font-suit-800 text-[18px] outline-none border-none focus:ring-0"
+              className="bg-transparent font-suit-800 text-[15px] sm:text-[18px] outline-none border-none focus:ring-0"
               spellCheck="false"
               readOnly={!isMyTodo}
             />
@@ -93,41 +93,50 @@ const TodoItem = ({ item, getTasks, currentUser }) => {
             <textarea
               value={editContent}
               onChange={(e) => setEditContent(e.target.value)}
-              className="bg-transparent text-[15px] outline-none border-none focus:ring-0 w-full resize-none"
-              rows={Math.max(2, editContent.split("\n").length)} // 내용에 따라 높이 자동 조절 (최소 3줄)
+              className="bg-transparent text-[12px] sm:text-[15px] outline-none border-none focus:ring-0 w-full resize-none"
+              rows={Math.max(2, editContent.split("\n").length)} // 내용에 따라 높이 자동 조절 (최소 2줄)
               style={{ whiteSpace: "pre-wrap" }} // 줄바꿈과 공백을 유지하도록 스타일 추가
               spellCheck="false"
               readOnly={!isMyTodo}
             />
-            <div>
-              {priorityEdit && isMyTodo ? (
-                <select
-                  ref={selectRef}
-                  value={editPriority}
-                  onChange={(e) => setEditPriority(Number(e.target.value))}
-                  onBlur={() => setPriorityEdit(false)}
-                  className="outline-none border-none bg-transparent text-[12px] cursor-pointer appearance-none"
-                  autoFocus
-                >
-                  {[1, 2, 3, 4, 5].map((n) => (
-                    <option key={n} value={n} className="text-[12px]">
-                      {"⭐".repeat(n)}
-                    </option>
-                  ))}
-                </select>
-              ) : (
-                <span
-                  className="text-[12px] cursor-pointer select-none"
-                  onMouseDown={handlePrioritySpanClick}
-                >
-                  {"⭐".repeat(editPriority)}
-                </span>
-              )}
+            <div className="flex justify-between h-[25px]">
+              <div>
+                {priorityEdit && isMyTodo ? (
+                  <select
+                    ref={selectRef}
+                    value={editPriority}
+                    onChange={(e) => setEditPriority(Number(e.target.value))}
+                    onBlur={() => setPriorityEdit(false)}
+                    className="outline-none border-none bg-transparent text-[9px] sm:text-[12px] cursor-pointer appearance-none"
+                    autoFocus
+                  >
+                    {[1, 2, 3, 4, 5].map((n) => (
+                      <option
+                        key={n}
+                        value={n}
+                        className="text-[9px] sm:text-[12px]"
+                      >
+                        {"⭐".repeat(n)}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <span
+                    className="text-[9px] sm:text-[12px] cursor-pointer select-none"
+                    onMouseDown={handlePrioritySpanClick}
+                  >
+                    {"⭐".repeat(editPriority)}
+                  </span>
+                )}
+              </div>
+              <p className="text-[10px] sm:text-[13px] text-[#585858] mt-[5px] sm:mt-[3px]">
+                by {item.author.name}
+              </p>
             </div>
           </div>
           <button
             onClick={handleModifyTaskStatus}
-            className="absolute top-[0px] right-[-3px] text-[13px] bg-blue-100 rounded-full pl-[5px] pr-[8px] py-[2px]"
+            className="absolute top-[0px] right-[-3px] text-[11px] sm:text-[13px] bg-blue-100 rounded-full pl-[5px] pr-[8px] py-[2px]"
             disabled={!isMyTodo}
           >
             {editIsComplete ? "✅완료" : "⏳진행 중"}
