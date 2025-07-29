@@ -5,10 +5,10 @@ import { Link, Navigate, useNavigate } from "react-router-dom";
 import api from "../utils/api";
 import { Notify } from "notiflix";
 
-const formGroupStyle = "flex flex-col gap-[2px]";
-const labelStyle = "text-[12px]";
+const formGroupStyle = "flex flex-col items-center gap-[2px] w-full";
+const labelStyle = "self-start text-[10px] sm:text-[12px]";
 const inputStyle =
-  "border rounded-[4px] w-[250px] p-[10px] text-[16px] outline-none";
+  "border rounded-[4px] w-full sm:w-[250px] p-[8px] sm:p-[10px] text-[14px] sm:text-[16px] outline-none";
 
 const LoginPage = ({ user, setUser }) => {
   const [email, setEmail] = useState("");
@@ -54,10 +54,12 @@ const LoginPage = ({ user, setUser }) => {
   return (
     <div className="display-center bg-gradient-to-b from-main to-main/20">
       <Form
-        className="bg-white px-[50px] py-[60px] rounded-[12px] [filter:drop-shadow(0px_0px_10px_rgba(0,0,0,0.4))] flex flex-col items-center gap-[12px]"
+        className="bg-white max-w-[270px] sm:max-w-none w-[80%] sm:w-[350px] px-[30px] sm:px-[50px] py-[50px] sm:py-[60px] rounded-[12px] [filter:drop-shadow(0px_0px_10px_rgba(0,0,0,0.4))] flex flex-col items-center gap-[12px]"
         onSubmit={handleLogin}
       >
-        <h1 className="font-suit-700 mb-[30px]">Login</h1>
+        <h1 className="font-suit-700 mb-[30px] text-[24px] sm:text-[26px]">
+          Login
+        </h1>
         <div className={formGroupStyle}>
           <label className={labelStyle}>이메일</label>
           <input
@@ -79,15 +81,15 @@ const LoginPage = ({ user, setUser }) => {
         </div>
         <button
           type="submit"
-          className="mt-[10px] p-[10px] bg-[#80b3ff] hover:bg-[#687eff] rounded-[6px] text-white w-[250px] text-[14px]"
+          className="mt-[10px] p-[8px] sm:p-[10px] bg-[#80b3ff] hover:bg-[#687eff] rounded-[6px] text-white w-full sm:w-[250px] text-[12px] sm:text-[14px]"
         >
           로그인
         </button>
-        <div className="text-[12px] flex gap-[10px]">
-          <p className="">계정이 없으신가요?</p>
+        <div className="text-[10px] sm:text-[12px] flex gap-[10px]">
+          <p>계정이 없으신가요?</p>
           <Link
             to="/register"
-            className="text-[12px] text-[#999999] hover:text-black no-underline hover:underline"
+            className="text-[#999999] hover:text-black no-underline hover:underline"
           >
             회원가입 하기
           </Link>

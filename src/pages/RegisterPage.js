@@ -4,17 +4,16 @@ import api from "../utils/api";
 import { Link, useNavigate } from "react-router-dom";
 import { Notify } from "notiflix";
 
-const formGroupStyle = "flex flex-col gap-[2px]";
-const labelStyle = "text-[12px]";
+const formGroupStyle = "flex flex-col items-center gap-[2px] w-full";
+const labelStyle = "self-start text-[10px] sm:text-[12px]";
 const inputStyle =
-  "border rounded-[4px] w-[250px] p-[10px] text-[16px] outline-none";
+  "border rounded-[4px] w-full sm: w-[250px] p-[8px] sm:p-[10px] text-[14px] sm:text-[16px] outline-none";
 
 const RegisterPage = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [pw, setPw] = useState("");
   const [pwCheck, setPwCheck] = useState("");
-  const [error, setError] = useState("");
 
   const nameInputRef = useRef(null);
   const emailInputRef = useRef(null);
@@ -52,23 +51,25 @@ const RegisterPage = () => {
       }
       const response = await api.post("/user", { name, email, password: pw });
       if (response.status === 200) {
+        Notify.success("회원가입이 완료되었습니다.");
         navigate("/login");
-      } else {
-        throw new Error(response.data.error);
-      }
+      } else throw new Error(response.data.error);
     } catch (error) {
-      setError(error.message);
+      Notify.failure(error.message, {
+        width: "320px",
+      });
     }
   };
 
   return (
     <div className="display-center bg-gradient-to-b from-main to-main/20">
-      {error && <div>{error}</div>}
       <Form
-        className="bg-white px-[50px] py-[60px] rounded-[12px] [filter:drop-shadow(0px_0px_10px_rgba(0,0,0,0.4))] flex flex-col items-center gap-[12px]"
+        className="bg-white max-w-[270px] sm:max-w-none w-[80%] sm:w-[350px] px-[30px] sm:px-[50px] py-[50px] sm:py-[60px] rounded-[12px] [filter:drop-shadow(0px_0px_10px_rgba(0,0,0,0.4))] flex flex-col items-center gap-[12px]"
         onSubmit={handleSubmit}
       >
-        <h1 className="font-suit-700 mb-[30px]">Sign Up</h1>
+        <h1 className="font-suit-700 mb-[30px] text-[24px] sm:text-[26px]">
+          Sign Up
+        </h1>
         <div className={formGroupStyle}>
           <label className={labelStyle}>이름</label>
           <input
@@ -115,13 +116,13 @@ const RegisterPage = () => {
 
         <button
           type="submit"
-          className="mt-[10px] p-[10px] bg-[#80b3ff] hover:bg-[#687eff] rounded-[6px] text-white w-[250px] text-[14px]"
+          className="mt-[10px] p-[10px] bg-[#80b3ff] hover:bg-[#687eff] rounded-[6px] text-white w-full sm:w-[250px] text-[12px] sm:text-[14px]"
         >
           회원가입
         </button>
         <Link
           to="/login"
-          className="text-[12px] text-[#999999] hover:text-black no-underline hover:underline"
+          className="text-[10px] sm:text-[12px] text-[#999999] hover:text-black no-underline hover:underline"
         >
           로그인하기
         </Link>

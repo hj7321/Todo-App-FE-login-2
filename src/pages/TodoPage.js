@@ -85,55 +85,71 @@ const TodoPage = ({ handleLogout }) => {
   }, []);
 
   return (
-    <section className="flex flex-col items-center min-h-screen py-[10px] px-[40px]">
+    <section className="flex flex-col items-center min-h-screen pt-[10px] pb-[40px] sm:pt-[10px] sm:pb-[10px] px-[30px] sm:px-[40px]">
       <header className="relative w-full flex justify-center">
-        <img src="/images/logo.png" alt="logo" width={300} className="" />
+        <img
+          src="/images/logo.png"
+          alt="logo"
+          width={300}
+          className="w-[200px] sm:w-[300px]"
+        />
         <button
           onClick={handleLogout}
-          className="text-[#747474] absolute right-[0px] text-[15px] hover:font-suit-700"
+          className="text-[#747474] absolute right-[-10px] sm:right-[0px] text-[10px] sm:text-[15px] hover:font-suit-700"
         >
           로그아웃
         </button>
       </header>
 
-      <div className="flex flex-col gap-[10px] mb-[20px] w-[600px] rounded-[6px] bg-main/20 px-[20px] pt-[12px] pb-[20px] shadow-md">
-        <h3 className="font-suit-800 text-[20px]">TODO를 작성해 주세요</h3>
-        <div className="flex flex-col gap-[5px]">
+      <div className="flex flex-col gap-[4px] sm:gap-[10px] mb-[20px] w-full sm:w-[600px] rounded-[6px] bg-main/20 px-[20px] pt-[12px] pb-[20px] shadow-md">
+        <h3 className="font-suit-800 text-[18px] sm:text-[20px]">
+          TODO를 작성해 주세요
+        </h3>
+        <div className="flex flex-col gap-[2px] sm:gap-[5px]">
           <div>
-            <label htmlFor="title" className="text-gray-600 text-[14px]">
+            <label
+              htmlFor="title"
+              className="text-gray-600 text-[12px] sm:text-[14px]"
+            >
               제목
             </label>
             <input
               type="text"
               id="title"
-              className="input-box"
+              className="input-box text-[13.5px] sm:text-[14.5px] p-[7px] sm:p-[10px]"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               ref={titleRef}
             />
           </div>
           <div>
-            <label htmlFor="content" className="text-gray-600 text-[14px]">
+            <label
+              htmlFor="content"
+              className="text-gray-600 text-[12px] sm:text-[14px]"
+            >
               내용
             </label>
             <textarea
               type="text"
               id="content"
-              className="input-box h-[15vh] resize-none"
+              className="input-box text-[13.5px] sm:text-[14.5px] p-[7px] sm:p-[10px] h-[15vh] resize-none"
               value={content}
               onChange={(e) => setContent(e.target.value)}
               ref={contentRef}
             />
           </div>
           <div className="flex gap-[10px] items-center">
-            <label htmlFor="priority" className="text-gray-600 text-[14px]">
+            <label
+              htmlFor="priority"
+              className="text-gray-600 text-[12px] sm:text-[14px]"
+            >
               중요도
             </label>
             <select
               id="priority"
               value={priority}
               onChange={(e) => setPriority(Number(e.target.value))}
-              className="h-[28px] w-[130px] border border-lightblue text-[14px] outline-none cursor-pointer rounded-[4px]"
+              className="h-[20px] sm:h-[28px] w-[100px] sm:w-[130px] border border-lightblue text-[11.5px] sm:text-[14px] outline-none cursor-pointer rounded-[4px]"
             >
               <option value={1}>⭐</option>
               <option value={2}>⭐⭐</option>
@@ -145,7 +161,7 @@ const TodoPage = ({ handleLogout }) => {
         </div>
         <button
           onClick={handleAddTask}
-          className="rounded-[4px] bg-green-400 hover:bg-green-500 text-white text-[13px] px-[10px] py-[6px] h-fit w-fit"
+          className="mt-[5px] sm:mt-[0px] rounded-[4px] bg-green-400 hover:bg-green-500 text-white text-[10.5px] sm:text-[13px] px-[8px] sm:px-[10px] py-[5px] sm:py-[6px] h-fit w-fit"
         >
           추가하기
         </button>
